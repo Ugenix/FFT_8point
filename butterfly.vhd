@@ -22,39 +22,36 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
+use work.fft_pckg.all;
 
 entity butterfly is
   Port ( 
-    s1_re : in  std_logic_vector (11 downto 0);
-    s1_im : in  std_logic_vector (11 downto 0);
-    s2_re : in  std_logic_vector (11 downto 0);
-    s2_im : in  std_logic_vector (11 downto 0);
-    w_re  : in  std_logic_vector (11 downto 0);
-    w_im  : in  std_logic_vector (11 downto 0);
-    g1_re : out std_logic_vector (11 downto 0);
-    g1_im : out std_logic_vector (11 downto 0);
-    g2_re : out std_logic_vector (11 downto 0);
-    g2_im : out std_logic_vector (11 downto 0)
+    s1 : in  complex;
+    s2 : in  complex;
+    w  : in  complex;
+    h1 : out complex;
+    h2 : out complex
   );
 end butterfly;
 
 architecture Behavioral of butterfly is
 
-  signal s2w_mult_re : std_logic_vector (23 downto 0);
-  signal s2w_mult_im : std_logic_vector (23 downto 0);
+  -- subtype fixed_point_t is fixed_point 
+  
+  signal s2w_mult_re : std_logic_vector(31 downto 0);
+  signal s2w_mult_im : std_logic_vector(31 downto 0);
 
 begin
-
-  -- Complex multiplicacion
-  s2w_mult_re <= std_logic_vector((signed(s2_re) * signed(w_re)) - (signed(s2_im) * signed(w_im)));
-  s2w_mult_im <= std_logic_vector((signed(s2_re) * signed(w_im)) + (signed(s2_im) * signed(w_re)));
+  
+  s2w_mult_re <= std_logic_vector((signed(s2.re) * signed(w.re)) - (signed(s2.im) * signed(w.im)));
+  s2w_mult_im <= std_logic_vector((signed(s2.re) * signed(w.im)) + (signed(s2.im) * signed(w.re)));
   
   -- Butterfly equations
   -- Addition
-  g1_re <= std_logic_vector(signed(s1_re) + signed(s2w_mult_re(23 downto 12)));
-  g1_im <= std_logic_vector(signed(s1_im) + signed(s2w_mult_im(23 downto 12)));
+  h1.re <= std_logic_vector(signed(s1.re) + signed(s2w_mult_re(21 downto 6)));
+  h1.im <= std_logic_vector(signed(s1.im) + signed(s2w_mult_im(21 downto 6)));
   -- Substraction
-  g2_re <= std_logic_vector(signed(s1_re) - signed(s2w_mult_re(23 downto 12)));
-  g2_im <= std_logic_vector(signed(s1_im) - signed(s2w_mult_im(23 downto 12)));
+  h2.re <= std_logic_vector(signed(s1.re) - signed(s2w_mult_re(21 downto 6)));
+  h2.im <= std_logic_vector(signed(s1.im) - signed(s2w_mult_im(21 downto 6)));
 
 end Behavioral;
