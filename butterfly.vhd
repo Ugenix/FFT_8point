@@ -35,23 +35,26 @@ entity butterfly is
 end butterfly;
 
 architecture Behavioral of butterfly is
-
-  -- subtype fixed_point_t is fixed_point 
   
-  signal s2w_mult_re : std_logic_vector(31 downto 0);
-  signal s2w_mult_im : std_logic_vector(31 downto 0);
+  signal s2w_mult_re : std_logic_vector ((2*(data_bits+extra_bits) - 1) downto 0);
+  signal s2w_mult_im : std_logic_vector ((2*(data_bits+extra_bits) - 1) downto 0);
 
 begin
   
-  s2w_mult_re <= std_logic_vector((signed(s2.re) * signed(w.re)) - (signed(s2.im) * signed(w.im)));
-  s2w_mult_im <= std_logic_vector((signed(s2.re) * signed(w.im)) + (signed(s2.im) * signed(w.re)));
+  s2w_mult_re <= std_logic_vector ((signed(s2.re) * signed(w.re)) - (signed(s2.im) * signed(w.im)));
+  s2w_mult_im <= std_logic_vector ((signed(s2.re) * signed(w.im)) + (signed(s2.im) * signed(w.re)));
   
   -- Butterfly equations
   -- Addition
-  h1.re <= std_logic_vector(signed(s1.re) + signed(s2w_mult_re(21 downto 6)));
-  h1.im <= std_logic_vector(signed(s1.im) + signed(s2w_mult_im(21 downto 6)));
+  h1.re <= std_logic_vector (signed(s1.re) + 
+           signed(s2w_mult_re((2*decimal_bits + int_bits + extra_bits - 1) downto (2*decimal_bits - decimal_bits))));
+  h1.im <= std_logic_vector (signed(s1.im) + 
+           signed(s2w_mult_im( (2*decimal_bits + int_bits + extra_bits - 1) downto (2*decimal_bits - decimal_bits))));
+           
   -- Substraction
-  h2.re <= std_logic_vector(signed(s1.re) - signed(s2w_mult_re(21 downto 6)));
-  h2.im <= std_logic_vector(signed(s1.im) - signed(s2w_mult_im(21 downto 6)));
+  h2.re <= std_logic_vector (signed(s1.re) - 
+           signed(s2w_mult_re((2*decimal_bits + int_bits + extra_bits - 1) downto (2*decimal_bits - decimal_bits))));
+  h2.im <= std_logic_vector( signed(s1.im) - 
+           signed(s2w_mult_im( (2*decimal_bits + int_bits + extra_bits - 1) downto (2*decimal_bits - decimal_bits) )) );
 
 end Behavioral;

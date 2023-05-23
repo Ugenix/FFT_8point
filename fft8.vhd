@@ -18,7 +18,6 @@
 -- 
 ----------------------------------------------------------------------------------
 
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
@@ -43,7 +42,8 @@ architecture Behavioral of fft8 is
       );
     end component;
   
-  signal g1 : complex_array := (others => (x"0000",x"0000"));
+  -- Internal values in butterfly 
+  signal g1 : complex_array := (others => (x"0000",x"0000")); 
   signal g2 : complex_array := (others => (x"0000",x"0000"));
   
   -- phase factor, W_N = e^(-j*2*pi/N) and N=8 here.
@@ -54,7 +54,7 @@ architecture Behavioral of fft8 is
   -- w2 = 0.0 - j * 1.0
   -- w3 = -0.7071 - j * 0.7071
   
-  -- 16-bit hexadecimal signed integers
+  -- 16-bit hexadecimal signed integers for S6.5
   constant w : phase_factor := ((x"0040",x"0000"), (x"002d",x"ffd3"),
                                 (x"0000",x"ffc0"), (x"ffd3",x"ffd3"));
 
